@@ -28,7 +28,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3002/auth/signup", {
+      const response = await fetch("https://mepa-backend.vercel.app/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
