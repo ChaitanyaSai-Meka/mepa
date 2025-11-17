@@ -94,3 +94,6 @@ Next.js Frontend → Express API Layer → PostgreSQL (Supabase)
 - Database migrations executed via Supabase SQL or Prisma migrations.
 - Frontend deployed to Vercel with automatic preview deployments.
 - Backend deployed to Render with health checks and logging enabled.
+
+## HOSTED LINK
+-frontend : -https://mepa.vercel.app/
