@@ -9,4 +9,4 @@ COPY . .
 
 EXPOSE 8001
 
-CMD ["uv", "run", "python", "main.py"]
+CMD ["uv", "run", "uvicorn", "app.app:app", "--host", "0.0.0.0", "--port", "$PORT"]
