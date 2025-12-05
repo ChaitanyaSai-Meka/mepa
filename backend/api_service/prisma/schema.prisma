@@ -8,76 +8,78 @@ datasource db {
 }
 
 model users {
-  id         Int      @id @default(autoincrement())
-  username   String   @unique
-  email      String   @unique
-  password   String
-  created_at DateTime @default(now())
-
+  id           Int            @id @default(autoincrement())
+  username     String         @unique
+  email        String         @unique
+  password     String
+  created_at   DateTime       @default(now())
+  feedback     feedback[]
+  history      history[]
   routes       routes[]
   saved_routes saved_routes[]
-  history      history[]
-  feedback     feedback[]
 
   @@map("users")
 }
 
 model stations {
-  id                String  @id
+  id                String     @id
   name              String
   parent_station_id String?
   line_name         String?
-  latitude          Decimal @db.Decimal(10, 8)
-  longitude         Decimal @db.Decimal(11, 8)
+  latitude          Decimal    @db.Decimal(10, 8)
+  longitude         Decimal    @db.Decimal(11, 8)
+  routes_as_end     routes[]   @relation("EndStation")
+  routes_as_start   routes[]   @relation("StartStation")
+  parent_station    stations?  @relation("StationHierarchy", fields: [parent_station_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  child_stations    stations[] @relation("StationHierarchy")
 
-  parent_station      stations?  @relation("StationHierarchy", fields: [parent_station_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  child_stations      stations[] @relation("StationHierarchy")
-  routes_as_start     routes[]   @relation("StartStation")
-  routes_as_end       routes[]   @relation("EndStation")
-
+  @@index([parent_station_id], map: "stations_parent_station_id_fkey")
   @@map("stations")
 }
 
 model routes {
-  id               Int      @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   user_id          Int?
   route_name       String?
   start_station_id String
   end_station_id   String
   shortest_path    Json
-  created_at       DateTime @default(now())
+  created_at       DateTime       @default(now())
+  history          history[]
+  end_station      stations       @relation("EndStation", fields: [end_station_id], references: [id])
+  start_station    stations       @relation("StartStation", fields: [start_station_id], references: [id])
+  user             users?         @relation(fields: [user_id], references: [id])
+  saved_routes     saved_routes[]
 
-  user          users?         @relation(fields: [user_id], references: [id], onDelete: SetNull)
-  start_station stations       @relation("StartStation", fields: [start_station_id], references: [id])
-  end_station   stations       @relation("EndStation", fields: [end_station_id], references: [id])
-  saved_routes  saved_routes[]
-  history       history[]
-
+  @@index([end_station_id], map: "routes_end_station_id_fkey")
+  @@index([start_station_id], map: "routes_start_station_id_fkey")
+  @@index([user_id], map: "routes_user_id_fkey")
   @@map("routes")
 }
 
 model saved_routes {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  route_id  Int
-  saved_at  DateTime @default(now())
-
-  user  users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  route routes @relation(fields: [route_id], references: [id], onDelete: Cascade)
+  id       Int      @id @default(autoincrement())
+  user_id  Int
+  route_id Int
+  saved_at DateTime @default(now())
+  route    routes   @relation(fields: [route_id], references: [id], onDelete: Cascade)
+  user     users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@unique([user_id, route_id])
+  @@index([route_id], map: "saved_routes_route_id_fkey")
   @@map("saved_routes")
 }
 
 model history {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  route_id   Int
-  viewed_at  DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  route_id  Int
+  viewed_at DateTime @default(now())
+  route     routes   @relation(fields: [route_id], references: [id], onDelete: Cascade)
+  user      users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
-  user  users  @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  route routes @relation(fields: [route_id], references: [id], onDelete: Cascade)
-
+  @@index([route_id], map: "history_route_id_fkey")
+  @@index([user_id], map: "history_user_id_fkey")
   @@map("history")
 }
 
@@ -86,8 +88,8 @@ model feedback {
   user_id    Int?
   feedback   String   @db.Text
   created_at DateTime @default(now())
+  user       users?   @relation(fields: [user_id], references: [id])
 
-  user users? @relation(fields: [user_id], references: [id], onDelete: SetNull)
-
+  @@index([user_id], map: "feedback_user_id_fkey")
   @@map("feedback")
 }

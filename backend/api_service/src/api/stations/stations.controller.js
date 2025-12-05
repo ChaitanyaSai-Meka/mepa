@@ -8,12 +8,37 @@ export const searchStations = async (req, res) => {
   try {
     const whereClause = query
       ? {
-          name: {
-            contains: query,
-            mode: 'insensitive'
+          OR: [
+            {
+              name: {
+                contains: query
+              }
+            },
+            {
+              id: {
+                contains: query
+              }
+            }
+          ],
+          parent_station_id: {
+            not: null
+          },
+          id: {
+            not: {
+              contains: 'ENT'
+            }
           }
         }
-      : {};
+      : {
+          parent_station_id: {
+            not: null
+          },
+          id: {
+            not: {
+              contains: 'ENT'
+            }
+          }
+        };
 
     const data = await prisma.stations.findMany({
       where: whereClause,
@@ -22,10 +47,22 @@ export const searchStations = async (req, res) => {
         name: true,
         line_name: true
       },
-      take: 10
+      take: 10,
+      orderBy: {
+        id: 'asc'
+      }
     });
 
-    return res.json(data);
+    const formatted = data.map(station => {
+      const platformMatch = station.id.match(/\d+$/);
+      const platformNumber = platformMatch ? platformMatch[0] : '';
+      return {
+        ...station,
+        name: platformNumber ? `${station.name} - Platform ${platformNumber}` : station.name
+      };
+    });
+
+    return res.json(formatted);
   } catch (err) {
     console.error('Server error searching stations:', err);
     res.status(500).json({ error: 'Server error' });
