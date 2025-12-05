@@ -110,6 +110,18 @@ def reconstruct_path(came_from, final_state_key, start_state, gtfs_data):
     }
 
 def find_fastest_path(graph, start_id, end_id, departure_time, gtfs_data, target_date):
+    if departure_time is None:
+        print(f"ERROR: departure_time is None!")
+        return None
+    
+    if start_id not in graph:
+        print(f"ERROR: start_id {start_id} not in graph")
+        return None
+    
+    if end_id not in graph:
+        print(f"ERROR: end_id {end_id} not in graph")
+        return None
+    
     pq = []
     heapq.heappush(pq, (departure_time, start_id))
     
@@ -134,7 +146,7 @@ def find_fastest_path(graph, start_id, end_id, departure_time, gtfs_data, target
 
         current_time, current_stop = heapq.heappop(pq)
         
-        if current_time > earliest_arrival[current_stop]:
+        if current_time is not None and earliest_arrival[current_stop] is not None and current_time > earliest_arrival[current_stop]:
             continue
             
         if current_stop == end_id:
@@ -155,7 +167,7 @@ def find_fastest_path(graph, start_id, end_id, departure_time, gtfs_data, target
                 train_dep = edge['departure_time']
                 train_arr = edge['arrival_time']
                 
-                if current_time <= train_dep:
+                if current_time is not None and train_dep is not None and current_time <= train_dep:
                     trip_id = edge['trip_id']
                     service_id = trip_service_map.get(trip_id)
                     

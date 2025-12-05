@@ -28,7 +28,7 @@ export default function SignupPage() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5004/auth/signup", {
+      const response = await fetch("http://localhost:5004/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,9 +39,11 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (response.ok) {
-        router.push("/login");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        router.push("/dashboard");
       } else {
-        setError(data.message || "Signup failed");
+        setError(data.error || "Signup failed");
       }
     } catch (err) {
       setError("Network error. Please try again.");

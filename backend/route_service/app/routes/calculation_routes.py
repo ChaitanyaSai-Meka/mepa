@@ -13,7 +13,9 @@ async def calculate_route(request: Request, body: CalculateRouteRequest):
     from ..core.Dijkstra import find_fastest_path
     from ..core.graph_builder import parse_time_to_seconds
     
+    print(f"Received departure_time: {body.departure_time}")
     dep_time_secs = parse_time_to_seconds(body.departure_time)
+    print(f"Parsed to seconds: {dep_time_secs}")
     
     try:
         if body.departure_date:

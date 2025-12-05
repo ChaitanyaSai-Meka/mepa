@@ -28,7 +28,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:5004/auth/login", {
+      const response = await fetch("http://localhost:5004/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -40,9 +40,10 @@ export default function LoginPage() {
 
       if (response.ok) {
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
         router.push("/dashboard");
       } else {
-        setError(data.message || "Login failed");
+        setError(data.error || "Login failed");
       }
     } catch (err) {
       setError("Network error. Please try again.");
