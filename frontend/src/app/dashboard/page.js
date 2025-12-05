@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function DashboardPage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -33,7 +35,7 @@ export default function DashboardPage() {
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     try {
-      await fetch("http://localhost:5004/api/auth/logout", {
+      await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -53,7 +55,7 @@ export default function DashboardPage() {
 
     try {
       const params = query ? `?query=${encodeURIComponent(query)}` : "";
-      const response = await fetch(`http://localhost:5004/api/stations/search${params}`);
+      const response = await fetch(`${API_URL}/api/stations/search${params}`);
       const data = await response.json();
       setStationResults(data);
       setSearchingFor(type);
@@ -101,7 +103,7 @@ export default function DashboardPage() {
       const defaultTime = departureTime ? `${departureTime}:00` : `${hours}:${minutes}:00`;
       const defaultDate = departureDate || now.toISOString().split('T')[0];
 
-      const response = await fetch("http://localhost:5004/api/routes/calculate", {
+      const response = await fetch(`${API_URL}/api/routes/calculate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -119,7 +121,7 @@ export default function DashboardPage() {
       setRouteResult(data);
 
       if (user) {
-        await fetch("http://localhost:5004/api/history", {
+        await fetch(`${API_URL}/api/history`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -141,7 +143,7 @@ export default function DashboardPage() {
     setSaving(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/saved", {
+      const response = await fetch(`${API_URL}/api/saved`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 export default function ProfilePage() {
   const router = useRouter();
   const [user, setUser] = useState(null);
@@ -39,7 +41,7 @@ export default function ProfilePage() {
   const loadProfile = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/profiles/me", {
+      const response = await fetch(`${API_URL}/api/profiles/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -56,7 +58,7 @@ export default function ProfilePage() {
     setLoadingRoutes(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/saved", {
+      const response = await fetch(`${API_URL}/api/saved`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -72,7 +74,7 @@ export default function ProfilePage() {
     setLoadingHistory(true);
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/history", {
+      const response = await fetch(`${API_URL}/api/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await response.json();
@@ -96,7 +98,7 @@ export default function ProfilePage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/profiles/me", {
+      const response = await fetch(`${API_URL}/api/profiles/me`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -121,7 +123,7 @@ export default function ProfilePage() {
   const unsaveRoute = async (routeId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5004/api/saved/${routeId}`, {
+      const response = await fetch(`${API_URL}/api/saved/${routeId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -137,7 +139,7 @@ export default function ProfilePage() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5004/api/history", {
+      const response = await fetch(`${API_URL}/api/history`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -151,7 +153,7 @@ export default function ProfilePage() {
   const handleLogout = async () => {
     const token = localStorage.getItem("token");
     try {
-      await fetch("http://localhost:5004/api/auth/logout", {
+      await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
