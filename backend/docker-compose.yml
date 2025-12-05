@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  api_service:
+    build: ./api_service
+    ports:
+      - "5004:5004"
+    environment:
+      - PORT=5004
+      - JWT_SECRET=${JWT_SECRET}
+      - DATABASE_URL=${DATABASE_URL}
+      - ROUTE_SERVICE_URL=http://route_service:8001/calculate
+    depends_on:
+      - route_service
+    restart: unless-stopped
+
+  route_service:
+    build: ./route_service
+    ports:
+      - "8001:8001"
+    restart: unless-stopped

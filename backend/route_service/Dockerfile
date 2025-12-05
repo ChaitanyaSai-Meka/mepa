@@ -1,15 +1,13 @@
-FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
-ENV UV_PROJECT_ENVIRONMENT="/app/.venv"
-
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync --frozen --no-cache
+RUN pip install uv && uv sync
 
 COPY . .
 
-EXPOSE 3002
+EXPOSE 8001
 
-CMD ["uv", "run", "main.py"]
+CMD ["uv", "run", "python", "main.py"]
