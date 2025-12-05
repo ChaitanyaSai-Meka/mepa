@@ -8,8 +8,6 @@ RUN npm install
 
 COPY . .
 
-RUN npx prisma generate
-
 EXPOSE 5004
 
-CMD ["npm", "start"]
+CMD ["sh", "-c", "npx prisma generate && npm start"]
