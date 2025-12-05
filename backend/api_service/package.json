@@ -8,7 +8,9 @@
   "main": "src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/app.js"
+    "start": "nodemon src/app.js",
+    "import-stations": "node scripts/importStations.js",
+    "check-stations": "node scripts/checkStations.js"
   },
   "dependencies": {
     "@prisma/client": "^6.19.0",
