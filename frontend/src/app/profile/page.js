@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+// const API_URL = `http://localhost:5004`;
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -20,6 +21,9 @@ export default function ProfilePage() {
   const [history, setHistory] = useState([]);
   const [loadingRoutes, setLoadingRoutes] = useState(false);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [savedPage, setSavedPage] = useState(1);
+  const [historyPage, setHistoryPage] = useState(1);
+  const itemsPerPage = 4;
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -344,35 +348,60 @@ export default function ProfilePage() {
                     </Link>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {savedRoutes.map((item) => (
-                      <div key={item.route.id} className="border border-gray-200 rounded-md p-4 hover:border-gray-300 transition-colors">
-                        <div className="flex justify-between items-start mb-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
-                              <span>{item.route.start_station.name}</span>
-                              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                              </svg>
-                              <span>{item.route.end_station.name}</span>
+                  <>
+                    <div className="space-y-3">
+                      {savedRoutes
+                        .slice((savedPage - 1) * itemsPerPage, savedPage * itemsPerPage)
+                        .map((item) => (
+                          <div key={item.route.id} className="border border-gray-200 rounded-md p-4 hover:border-gray-300 transition-colors">
+                            <div className="flex justify-between items-start mb-2">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-900">
+                                  <span>{item.route.start_station.name}</span>
+                                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                  </svg>
+                                  <span>{item.route.end_station.name}</span>
+                                </div>
+                                {item.route.route_name && (
+                                  <p className="text-xs text-gray-500 mt-1">{item.route.route_name}</p>
+                                )}
+                                <p className="text-xs text-gray-400 mt-1">
+                                  Saved {new Date(item.saved_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => unsaveRoute(item.route.id)}
+                                className="text-xs text-red-600 hover:text-red-700 font-medium"
+                              >
+                                Remove
+                              </button>
                             </div>
-                            {item.route.route_name && (
-                              <p className="text-xs text-gray-500 mt-1">{item.route.route_name}</p>
-                            )}
-                            <p className="text-xs text-gray-400 mt-1">
-                              Saved {new Date(item.saved_at).toLocaleDateString()}
-                            </p>
                           </div>
-                          <button
-                            onClick={() => unsaveRoute(item.route.id)}
-                            className="text-xs text-red-600 hover:text-red-700 font-medium"
-                          >
-                            Remove
-                          </button>
-                        </div>
+                        ))}
+                    </div>
+                    {savedRoutes.length > itemsPerPage && (
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                        <button
+                          onClick={() => setSavedPage(savedPage - 1)}
+                          disabled={savedPage === 1}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Previous
+                        </button>
+                        <span className="text-xs text-gray-500">
+                          Page {savedPage} of {Math.ceil(savedRoutes.length / itemsPerPage)}
+                        </span>
+                        <button
+                          onClick={() => setSavedPage(savedPage + 1)}
+                          disabled={savedPage >= Math.ceil(savedRoutes.length / itemsPerPage)}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Next
+                        </button>
                       </div>
-                    ))}
-                  </div>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -405,21 +434,44 @@ export default function ProfilePage() {
                       </button>
                     </div>
                     <div className="space-y-3">
-                      {history.map((item, index) => (
-                        <div key={index} className="border border-gray-200 rounded-md p-4 hover:border-gray-300 transition-colors">
-                          <div className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-1">
-                            <span>{item.route.start_station.name}</span>
-                            <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
-                            <span>{item.route.end_station.name}</span>
+                      {history
+                        .slice((historyPage - 1) * itemsPerPage, historyPage * itemsPerPage)
+                        .map((item, index) => (
+                          <div key={index} className="border border-gray-200 rounded-md p-4 hover:border-gray-300 transition-colors">
+                            <div className="flex items-center gap-2 text-sm font-medium text-gray-900 mb-1">
+                              <span>{item.route.start_station.name}</span>
+                              <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                              </svg>
+                              <span>{item.route.end_station.name}</span>
+                            </div>
+                            <p className="text-xs text-gray-400">
+                              Viewed {new Date(item.viewed_at).toLocaleDateString()}
+                            </p>
                           </div>
-                          <p className="text-xs text-gray-400">
-                            Viewed {new Date(item.viewed_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                      ))}
+                        ))}
                     </div>
+                    {history.length > itemsPerPage && (
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+                        <button
+                          onClick={() => setHistoryPage(historyPage - 1)}
+                          disabled={historyPage === 1}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Previous
+                        </button>
+                        <span className="text-xs text-gray-500">
+                          Page {historyPage} of {Math.ceil(history.length / itemsPerPage)}
+                        </span>
+                        <button
+                          onClick={() => setHistoryPage(historyPage + 1)}
+                          disabled={historyPage >= Math.ceil(history.length / itemsPerPage)}
+                          className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
