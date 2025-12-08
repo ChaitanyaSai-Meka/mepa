@@ -34,6 +34,7 @@ model stations {
   child_stations    stations[] @relation("StationHierarchy")
 
   @@index([parent_station_id], map: "stations_parent_station_id_fkey")
+  @@index([name], map: "stations_name_idx")
   @@map("stations")
 }
 
